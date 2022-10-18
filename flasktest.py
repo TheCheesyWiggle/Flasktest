@@ -1,27 +1,30 @@
-from flask import Flask, render_template,request,redirect
-import requests
-import json
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
-username = ""
+user = "default"
 
 def login(username, password):
-    if (username == "test") and (password =="test"):
+    if (username == "Finn") and (password=="test"):
             username = "test"
-            return redirect("/welcome")
-    return render_template("index.html")
+            return True
+    else:
+        return False
 
-@app.route("/welcome",)
+@app.route("/welcome")
 def welcome():
-    return render_template("welcome.html",username=username)
+    return render_template("welcome.html",username=user)
 
 @app.route("/login", methods =['GET','POST'])
 def login_page():
     if request.method=='POST':
         username = request.form['username']
         password = request.form['password']
-    login(username, password)
-    return render_template("login.html")
+        if login(username, password):
+            print("hello")
+            global user 
+            user = username
+            redirect('/welcome')
+    return render_template("login.html", login_failed = False)
 
 @app.route("/")
 def home():
