@@ -8,6 +8,9 @@
         <h1>
             Test Website
         </h1>
+        <!--Greets user-->
         <p>Welcome {{session["user"]}}</p>
+        <!--Logout button-->
+        <a class="footer" href="{{url_for('logout')}}">Logout</a>
     </body>
 </html>

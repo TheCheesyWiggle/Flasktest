@@ -11,7 +11,25 @@ p{
     text-align: center;
     color: white;
 }
+a{
+    text-align: center;
+    color: white;
+    text-decoration: none;
+}
+a:hover {
+    color:orange;
+    text-size-: 10;
+  }
 form{
     text-align: center;
     color:white;
 }
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: black;
+    margin-top: 25px;
+    font-size: 200px;
+  }
