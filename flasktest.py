@@ -29,10 +29,7 @@ def login_page():
         if not login_failed:
             if "user" in session:
                 return redirect(url_for('welcome'))
-            else:
-                return render_template("login.html")
-        else:
-            return render_template("login.html")
+    flash("Login failed", "info")            
     return render_template("login.html")
 
 def login(username, password):
@@ -46,8 +43,7 @@ defines what happens when you logout
 '''
 @app.route("/logout")
 def logout():
-    session.pop("user",None)
-    flash("You have been logged out", "info")
+    session.pop("user", None)
     return redirect(url_for("login_page"))
 
 '''
