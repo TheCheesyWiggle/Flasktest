@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__,template_folder='templates', static_folder='staticFiles')
 
@@ -47,6 +47,7 @@ defines what happens when you logout
 @app.route("/logout")
 def logout():
     session.pop("user",None)
+    flash("You have been logged out", "info")
     return redirect(url_for("login_page"))
 
 '''
