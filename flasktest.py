@@ -15,7 +15,7 @@ def welcome():
     if user != "default":
         return render_template("welcome.html",username=user)
     else:
-        return redirect(url_for('login'))
+        return redirect(url_for('login_page'))
 
 #defines what happens at the route /login this allows the user to login and us to redirect them to the welcome page
 @app.route("/login", methods =['GET','POST'])
