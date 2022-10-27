@@ -4,12 +4,6 @@ app = Flask(__name__)
 
 app.secret_key = "Hello fellow programmer"
 
-def login(username, password):
-    if (username == "finn") and (password=="test"):
-            return True
-    else:
-        return False
-
 '''
 defines what happens at the route /welcome this allows us to welcome the user
 '''
@@ -32,11 +26,20 @@ def login_page():
         pw = request.form['password']
         session["user"] = user
         login_failed = not login(user, pw)
-        if not login_failed or "user" in session:
-            return redirect(url_for('welcome'))
+        if not login_failed:
+            if "user" in session:
+                return redirect(url_for('welcome'))
+            else:
+                return render_template("login.html")
         else:
             return render_template("login.html")
     return render_template("login.html")
+
+def login(username, password):
+    if (username == "finn") and (password=="test"):
+        return True
+    else:
+        return False
 
 '''
 defines what happens when you logout
