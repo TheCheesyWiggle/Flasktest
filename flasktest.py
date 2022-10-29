@@ -1,12 +1,25 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__,template_folder='templates', static_folder='staticFiles')
 
 app.secret_key = "Hello fellow programmer"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.sqlite3'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-'''
-defines what happens at the route /welcome this allows us to welcome the user
-'''
+'''Database code'''
+db = SQLAlchemy(app)
+
+class users(db.Model):
+    _id = db.Column("id", db.Integer, primary_key = True)
+    name = db.Column("name", db.String(100))
+    password = db.Column("password", db.String(100))
+
+    def __init__(self, name, password):
+        self.name = name
+        self.password = password
+
+'''Defines what happens at the route /welcome this allows us to welcome the user'''
 @app.route("/welcome")
 def welcome():
     if "user" in session:
@@ -16,48 +29,83 @@ def welcome():
         return redirect(url_for('login_page'))
 
 
-'''
-defines what happens at the route /login this allows the user to login and us to redirect them to the welcome page
-'''
+'''Defines what happens at the route /login this allows the user to login and us to redirect them to the welcome page'''
 @app.route("/login", methods =['GET','POST'])
 def login_page():
     if request.method=='POST':
         user = request.form['username']
         pw = request.form['password']
         session["user"] = user
-        login_failed = not login(user, pw)
-        if not login_failed:
+        usr = users(user,pw)
+        if login(usr):
             if "user" in session:
                 return redirect(url_for('welcome'))
     flash("Login failed", "info")            
     return render_template("login.html")
+    #hash pw
 
-def login(username, password):
-    if (username == "finn") and (password=="test"):
+def login(usr):
+    usr_found = users.query.filter_by(name=usr).first()
+    if usr_found.password == usr.password:
         return True
     else:
         return False
+    # add feed back to the user if the username or pass word is incorrect
 
-'''
-defines what happens when you logout
-'''
+'''Defines what happens when you logout'''
 @app.route("/logout")
 def logout():
     session.pop("user", None)
     return redirect(url_for("login_page"))
 
-'''
-defines what happens at the route /sign up, this allows the user to create an account
-'''
-@app.route("/signup")
-def signup():
-    return "signed up"
+'''Defines what happens at the route /sign up, this allows the user to create an account'''
+@app.route("/signup", methods =['GET','POST'])
+def signup_page():
+    if request.method=='POST':
+        user = request.form['username']
+        pw = request.form['password']
+        valid_pw = request.form['validate_password']
+        session["user"] = user
+        usr = users(user,pw)
+        db.session.add(usr)
+        db.session.commit()
 
-'''
-defines what happens at the route at the defalt site, gateway to the rest of the website
-'''
+        if signup_sucess(valid_pw, usr):
+            session["user"] = user
+
+            if "user" in session:
+                return redirect(url_for('welcome'))
+    return render_template("signup.html")
+    
+
+def signup_sucess(valid_pw,usr):
+    usr_found = ""
+    usr_found = users.query.filter_by(name=usr).first()
+    if usr.password != valid_pw or usr_found == "":
+        return False
+    else:
+        return True
+    # add feed back to the user if username is taken
+    #hash pw
+
+'''displays database'''
+@app.route("/view")
+def view():
+    return render_template("view.html", values = users.query.all())
+#needs protecting
+
+'''Defines what happens at the route at the defalt site, gateway to the rest of the website'''
 @app.route("/")
 def home():
+    db.create_all()
+    usr = users("finn", " ")
+    for i in range (0,8):
+        usr_found = users.query.filter_by(name=usr).delete()
+        db.session.commit()
     return render_template("index.html")
 
-app.run(host="0.0.0.0",port=80)
+def main():
+    
+    app.run(host="0.0.0.0",port=80,debug=True)
+
+main()

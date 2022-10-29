@@ -1,0 +1,9 @@
+{%block title%}View all users:{% endblock %}
+{%block content%}
+    {%for item in values%}
+        <p> 
+            username: {{item.name}}<br>
+            password: {{item.pw}}<br><br>
+        </p>
+    {%endfor%}
+{% endblock %}

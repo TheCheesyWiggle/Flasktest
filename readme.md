@@ -1,3 +1,7 @@
 # Flask-test
 
-messing around with flask framework in python
+Messing around with the flask database in python
+Included:
+- Templates
+- Sessions
+- Database
