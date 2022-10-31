@@ -45,11 +45,14 @@ def login_page():
     #hash pw
 
 def login(usr):
-    usr_found = users.query.filter_by(name=usr).first()
-    if usr_found.password == usr.password:
-        return True
-    else:
-        return False
+    try:
+        usr_found = users.query.filter_by(name=usr).first()
+        if usr_found.password == usr.password:
+            return True
+        else:
+            return False
+    except:
+        print("Cannot find user in database.\nConsider signing up")
     # add feed back to the user if the username or pass word is incorrect
 
 '''Defines what happens when you logout'''
@@ -62,31 +65,41 @@ def logout():
 @app.route("/signup", methods =['GET','POST'])
 def signup_page():
     if request.method=='POST':
+        
         user = request.form['username']
         pw = request.form['password']
         valid_pw = request.form['validate_password']
         session["user"] = user
+
         usr = users(user,pw)
         db.session.add(usr)
-        db.session.commit()
 
         if signup_sucess(valid_pw, usr):
             session["user"] = user
 
             if "user" in session:
+                db.session.commit()
                 return redirect(url_for('welcome'))
     return render_template("signup.html")
     
-
+ 
 def signup_sucess(valid_pw,usr):
-    usr_found = ""
-    usr_found = users.query.filter_by(name=usr).first()
-    if usr.password != valid_pw or usr_found == "":
-        return False
-    else:
-        return True
+    '''
+    Try block attempts to find a user with the same name.
+    if no such user exists then it raises and error and the except block will execute.
+    '''
+    try:
+        usr_found = users.query.filter_by(name=usr).first()
+        if usr.password != valid_pw or usr_found == None:
+            return False
+        else:
+            return True
     # add feed back to the user if username is taken
     #hash pw
+    except:
+        print("An exception")
+        raise
+        
 
 '''displays database'''
 @app.route("/view")
@@ -98,10 +111,6 @@ def view():
 @app.route("/")
 def home():
     db.create_all()
-    usr = users("finn", " ")
-    for i in range (0,8):
-        usr_found = users.query.filter_by(name=usr).delete()
-        db.session.commit()
     return render_template("index.html")
 
 def main():
