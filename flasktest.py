@@ -7,9 +7,9 @@ app.secret_key = "Hello fellow programmer"
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.sqlite3'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-'''Database code'''
-db = SQLAlchemy(app)
 
+db = SQLAlchemy(app)
+'''Database code'''
 class users(db.Model):
     _id = db.Column("id", db.Integer, primary_key = True)
     name = db.Column("name", db.String(100))
@@ -19,9 +19,10 @@ class users(db.Model):
         self.name = name
         self.password = password
 
-'''Defines what happens at the route /welcome this allows us to welcome the user'''
+
 @app.route("/welcome")
 def welcome():
+    '''Defines what happens at the route /welcome this allows us to welcome the user'''
     if "user" in session:
         user = session["user"]
         return render_template("welcome.html")
@@ -29,9 +30,10 @@ def welcome():
         return redirect(url_for('login_page'))
 
 
-'''Defines what happens at the route /login this allows the user to login and us to redirect them to the welcome page'''
+
 @app.route("/login", methods =['GET','POST'])
 def login_page():
+    '''Defines what happens at the route /login this allows the user to login and us to redirect them to the welcome page'''
     if request.method=='POST':
         user = request.form['username']
         pw = request.form['password']
@@ -55,15 +57,17 @@ def login(usr):
         print("Cannot find user in database.\nConsider signing up")
     # add feed back to the user if the username or pass word is incorrect
 
-'''Defines what happens when you logout'''
+
 @app.route("/logout")
 def logout():
+    '''Defines what happens when you logout'''
     session.pop("user", None)
     return redirect(url_for("login_page"))
 
-'''Defines what happens at the route /sign up, this allows the user to create an account'''
+
 @app.route("/signup", methods =['GET','POST'])
 def signup_page():
+    '''Defines what happens at the route /sign up, this allows the user to create an account'''
     if request.method=='POST':
         
         user = request.form['username']
@@ -101,20 +105,20 @@ def signup_sucess(valid_pw,usr):
         raise
         
 
-'''displays database'''
 @app.route("/view")
 def view():
+    '''displays database'''
     return render_template("view.html", values = users.query.all())
 #needs protecting
 
-'''Defines what happens at the route at the defalt site, gateway to the rest of the website'''
+
 @app.route("/")
 def home():
+    '''Defines what happens at the route at the defalt site, gateway to the rest of the website'''
     db.create_all()
     return render_template("index.html")
 
 def main():
-    
     app.run(host="0.0.0.0",port=80,debug=True)
 
 main()
